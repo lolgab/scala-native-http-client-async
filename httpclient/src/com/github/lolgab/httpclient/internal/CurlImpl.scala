@@ -18,7 +18,7 @@ import scala.scalanative.loop._
 import com.github.lolgab.httpclient._
 import scala.annotation.tailrec
 
-object CurlImpl {
+private [httpclient] object CurlImpl {
   import CApi._
   import CApiOps._
 
@@ -26,7 +26,7 @@ object CurlImpl {
     throw new Error("Could not init curl")
   }
 
-  private val curlHandle = curl_multi_init()
+  val curlHandle = curl_multi_init()
 
   private def curlPerform(rwResult: RWResult, sockfd: Int) = {
     val runningHandles = stackalloc[CInt]()
@@ -137,32 +137,11 @@ object CurlImpl {
       size * nmemb
     }
 
+  type Memory = CStruct2[Ptr[Byte], CSize]
   case class CurlData(
       callback: Response => Unit,
-      memory: Ptr[CStruct2[Ptr[Byte], CSize]]
+      memory: Ptr[Memory]
   )
-  type Memory = CStruct2[Ptr[Byte], CSize]
-
-  def get(url: String)(callback: Response => Unit): Unit = {
-    val handle = curl_easy_init()
-    val structArrayPtr = malloc(sizeof[Memory]).asInstanceOf[Ptr[Memory]]
-    structArrayPtr._1 = malloc(512.toULong)
-    structArrayPtr._2 = 0.toULong
-    curl_easy_setopt(
-      handle,
-      CURLOPT_WRITEDATA,
-      structArrayPtr.asInstanceOf[Ptr[Byte]]
-    )
-    curl_easy_setopt(
-      handle,
-      CURLOPT_WRITEFUNCTION,
-      writeMemoryCallback
-    )
-    HandleUtils.setData(handle, CurlData(callback, structArrayPtr))
-    Zone { implicit z => curl_easy_setopt(handle, CURLOPT_URL, toCString(url)) }
-    val code = curl_multi_add_handle(curlHandle, handle)
-  }
-
   def checkMultiInfo(): Unit = {
     @tailrec
     def loop(): Unit = {

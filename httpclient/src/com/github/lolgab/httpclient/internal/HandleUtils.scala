@@ -6,7 +6,7 @@ import scala.scalanative.unsafe.{Ptr, stackalloc}
 import scala.scalanative.libc.stdlib
 import CApi._
 
-private[internal] object HandleUtils {
+private[httpclient] object HandleUtils {
   private val references = new java.util.IdentityHashMap[Object, Int]()
 
   @inline def getData[T <: Object](handle: Ptr[Byte]): T = {

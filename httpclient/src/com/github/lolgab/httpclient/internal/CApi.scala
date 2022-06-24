@@ -3,7 +3,7 @@ package com.github.lolgab.httpclient.internal
 import scala.scalanative.unsafe._
 
 @link("curl")
-@extern object CApi {
+@extern private [httpclient] object CApi {
   type CurlBuffer = CStruct2[CString, CSize]
   type CurlOption = Int
   type CurlRequest = CStruct4[Ptr[Byte], Long, Long, Int]
@@ -16,20 +16,30 @@ import scala.scalanative.unsafe._
 
   @name("scalanative_CURL_GLOBAL_ALL")
   val CURL_GLOBAL_ALL: CInt = extern
+  @name("scalanative_CURLINFO_PRIVATE")
+  val CURLINFO_PRIVATE: CInt = extern
+  @name("scalanative_CURLINFO_RESPONSE_CODE")
+  val CURLINFO_RESPONSE_CODE: CInt = extern
   @name("scalanative_CURLMSG_DONE")
   val CURLMSG_DONE: CInt = extern
   @name("scalanative_CURLMOPT_TIMERFUNCTION")
   val CURLMOPT_TIMERFUNCTION: CInt = extern
   @name("scalanative_CURLMOPT_SOCKETFUNCTION")
   val CURLMOPT_SOCKETFUNCTION: CInt = extern
+  @name("scalanative_CURLOPT_CUSTOMREQUEST")
+  val CURLOPT_CUSTOMREQUEST: CInt = extern
+  @name("scalanative_CURLOPT_HTTPGET")
+  val CURLOPT_HTTPGET: CInt = extern
+  @name("scalanative_CURLOPT_NOBODY")
+  val CURLOPT_NOBODY: CInt = extern
   @name("scalanative_CURLOPT_WRITEDATA")
   val CURLOPT_WRITEDATA: CInt = extern
+  @name("scalanative_CURLOPT_POST")
+  val CURLOPT_POST: CInt = extern
   @name("scalanative_CURLOPT_PRIVATE")
   val CURLOPT_PRIVATE: CInt = extern
-  @name("scalanative_CURLINFO_PRIVATE")
-  val CURLINFO_PRIVATE: CInt = extern
-  @name("scalanative_CURLINFO_RESPONSE_CODE")
-  val CURLINFO_RESPONSE_CODE: CInt = extern
+  @name("scalanative_CURLOPT_PUT")
+  val CURLOPT_PUT: CInt = extern
   @name("scalanative_CURLOPT_URL")
   val CURLOPT_URL: CInt = extern
   @name("scalanative_CURLOPT_WRITEFUNCTION")
@@ -77,6 +87,13 @@ import scala.scalanative.unsafe._
   ): CInt =
     extern
 
+  def curl_easy_setopt(
+      handle: Ptr[Byte],
+      option: CInt,
+      parameter: Long
+  ): CInt =
+    extern
+
   def curl_easy_getinfo(
       handle: Ptr[Byte],
       info: CInt,
@@ -84,7 +101,7 @@ import scala.scalanative.unsafe._
   ): CInt =
     extern
 
-  def curl_easy_perform(easy_handle: Ptr[Byte]): CInt = extern
+  def curl_easy_perform(handle: Ptr[Byte]): CInt = extern
 
   def curl_multi_init(): Ptr[Byte] = extern
 
