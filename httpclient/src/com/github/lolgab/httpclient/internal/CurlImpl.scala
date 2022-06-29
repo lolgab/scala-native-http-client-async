@@ -145,9 +145,6 @@ private [httpclient] object CurlImpl {
     }
 
   type Memory = CStruct2[Ptr[Byte], CSize]
-  case class CurlData(
-
-  )
   def checkMultiInfo(): Unit = {
     @tailrec
     def loop(): Unit = {
@@ -176,6 +173,7 @@ private [httpclient] object CurlImpl {
             curl_slist_free_all(request.headersList)
             curl_multi_remove_handle(curlHandle, easyHandle)
             curl_easy_cleanup(easyHandle)
+            HandleUtils.unref(request)
           }
         }
         loop()

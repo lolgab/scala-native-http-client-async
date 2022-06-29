@@ -25,7 +25,7 @@ class Request private (handle: Ptr[Byte]) {
   import CApi._
   import CApiOps._
   private [httpclient] var callback: Response => Unit = null
-  private [httpclient] var memory: Ptr[Memory] = malloc(sizeof[Memory]).asInstanceOf[Ptr[Memory]]
+  private [httpclient] val memory: Ptr[Memory] = malloc(sizeof[Memory]).asInstanceOf[Ptr[Memory]]
   private [httpclient] var headersList: Ptr[CurlSList] = null
   memory._1 = malloc(0.toULong)
   memory._2 = 0.toULong
