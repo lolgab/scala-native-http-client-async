@@ -23,6 +23,12 @@ object HttpClientTests extends TestSuite {
         assert(response.body.contains(""""url": "http://httpbin.org/post""""))
       }
     }
+    test("post body") {
+      val text = "Some text to send in the body"
+      Request().method(Method.POST).url("http://httpbin.org/post").header("Content-Type: text/plain").body(text).future().map { response =>
+        assert(response.body.contains(s""""data": "$text""""))
+      }
+    }
     test("put request") {
       Request().method(Method.PUT).url("http://httpbin.org/put").future().map { response =>
         response.code ==> 200
