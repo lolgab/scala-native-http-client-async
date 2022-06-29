@@ -15,6 +15,8 @@ import scala.scalanative.runtime.{
   toRawPtr
 }
 import scala.scalanative.loop._
+import scala.scalanative.loop.LibUV._
+import scala.scalanative.loop.LibUVConstants._
 import com.github.lolgab.httpclient._
 import scala.annotation.tailrec
 
@@ -25,6 +27,10 @@ private [httpclient] object CurlImpl {
   if (curl_global_init(CURL_GLOBAL_ALL) != 0) {
     throw new Error("Could not init curl")
   }
+
+  private val timerMemory = new Array[Byte](uv_handle_size(UV_TIMER_T).toInt)
+  val timerHandle = timerMemory.asInstanceOf[ByteArray].at(0)
+  uv_timer_init(EventLoop.loop, timerHandle)
 
   val curlHandle = curl_multi_init()
 
@@ -56,6 +62,7 @@ private [httpclient] object CurlImpl {
       contexts += res
       res
     }
+    def unref(context: CurlContext) = contexts -= context
   }
 
   val handleSocketCFuncPtr: CurlSocketCallback = (
@@ -95,6 +102,7 @@ private [httpclient] object CurlImpl {
       case CURL_POLL_REMOVE =>
         if (socketp != null) {
           socketp.poll.stop()
+          CurlContext.unref(socketp)
           curl_multi_assign(curlHandle, sockfd, null)
         }
       case other =>
@@ -105,22 +113,21 @@ private [httpclient] object CurlImpl {
     0
   }
   curl_multi_setopt(curlHandle, CURLMOPT_SOCKETFUNCTION, handleSocketCFuncPtr)
-  private var timer: Timer = null.asInstanceOf[Timer]
   val startTimeout: CurlTimerCallback =
     (multi: Ptr[Byte], timeout_ms: CLong, userp: Ptr[Byte]) => {
-      if (timeout_ms < 0) timer.clear()
+      if (timeout_ms < 0) uv_timer_stop(timerHandle)
       else {
         val newTimeout = if (timeout_ms == 0) 1 else timeout_ms.toLong
-        timer = Timer.timeout(newTimeout.millis) { () =>
+        uv_timer_start(timerHandle, (_: Ptr[Byte]) => {
           val running_handles = stackalloc[CInt]()
-          curl_multi_socket_action(
-            curlHandle,
-            CURL_SOCKET_TIMEOUT,
-            0,
-            running_handles
-          )
+            curl_multi_socket_action(
+              curlHandle,
+              CURL_SOCKET_TIMEOUT,
+              0,
+              running_handles
+            )
           checkMultiInfo()
-        }
+        }, newTimeout, 0)
       }
       0
     }
