@@ -36,6 +36,14 @@ class Request private (handle: Ptr[Byte]) {
       Zone { implicit z => curl_easy_setopt(handle, CURLOPT_URL, toCString(value)) }
       this
     }
+    def body(value: String): Request = Zone { implicit z =>
+      curl_easy_setopt(
+        handle,
+        CURLOPT_COPYPOSTFIELDS,
+        toCString(value)
+      )
+      this
+    }
     private def setCallback(value: Response => Unit): Request = {
       val structArrayPtr = malloc(sizeof[Memory]).asInstanceOf[Ptr[Memory]]
       structArrayPtr._1 = malloc(0.toULong)

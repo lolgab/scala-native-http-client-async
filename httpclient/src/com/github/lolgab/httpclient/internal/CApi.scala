@@ -26,6 +26,8 @@ import scala.scalanative.unsafe._
   val CURLMOPT_TIMERFUNCTION: CInt = extern
   @name("scalanative_CURLMOPT_SOCKETFUNCTION")
   val CURLMOPT_SOCKETFUNCTION: CInt = extern
+  @name("scalanative_CURLOPT_COPYPOSTFIELDS")
+  val CURLOPT_COPYPOSTFIELDS: CInt = extern
   @name("scalanative_CURLOPT_CUSTOMREQUEST")
   val CURLOPT_CUSTOMREQUEST: CInt = extern
   @name("scalanative_CURLOPT_HTTPGET")
