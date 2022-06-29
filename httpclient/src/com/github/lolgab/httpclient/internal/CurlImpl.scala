@@ -146,8 +146,7 @@ private [httpclient] object CurlImpl {
 
   type Memory = CStruct2[Ptr[Byte], CSize]
   case class CurlData(
-      callback: Response => Unit,
-      memory: Ptr[Memory]
+
   )
   def checkMultiInfo(): Unit = {
     @tailrec
@@ -163,17 +162,18 @@ private [httpclient] object CurlImpl {
             CURLINFO_RESPONSE_CODE,
             responseCode.asInstanceOf[Ptr[Byte]]
           )
-          val curlData = HandleUtils.getData[CurlData](easyHandle)
+          val request = HandleUtils.getData[Request](easyHandle)
           val response = Response(
             code = (!responseCode).toInt,
             body = StringUtils
-              .fromCStringAndSize(curlData.memory._1, curlData.memory._2.toInt)
+              .fromCStringAndSize(request.memory._1, request.memory._2.toInt)
           )
           try {
-            curlData.callback(response)
+            request.callback(response)
           } finally {
-            free(curlData.memory._1)
-            free(curlData.memory.asInstanceOf[Ptr[Byte]])
+            free(request.memory._1)
+            free(request.memory.asInstanceOf[Ptr[Byte]])
+            curl_slist_free_all(request.headersList)
             curl_multi_remove_handle(curlHandle, easyHandle)
             curl_easy_cleanup(easyHandle)
           }

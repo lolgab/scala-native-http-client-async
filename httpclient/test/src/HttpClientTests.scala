@@ -12,6 +12,11 @@ object HttpClientTests extends TestSuite {
         assert(response.body.contains(""""url": "http://httpbin.org/get""""))
       }
     }
+    test("header") {      
+      Request().url("http://httpbin.org/get").header("Foo: bar").future().map { response =>
+        assert(response.body.contains(""""Foo": "bar""""))
+      }
+    }
     test("post request") {
       Request().method(Method.POST).url("http://httpbin.org/post").future().map { response =>
         response.code ==> 200

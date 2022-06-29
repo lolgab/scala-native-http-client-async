@@ -32,6 +32,8 @@ import scala.scalanative.unsafe._
   val CURLOPT_CUSTOMREQUEST: CInt = extern
   @name("scalanative_CURLOPT_HTTPGET")
   val CURLOPT_HTTPGET: CInt = extern
+  @name("scalanative_CURLOPT_HTTPHEADER")
+  val CURLOPT_HTTPHEADER: CInt = extern
   @name("scalanative_CURLOPT_NOBODY")
   val CURLOPT_NOBODY: CInt = extern
   @name("scalanative_CURLOPT_WRITEDATA")
