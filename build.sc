@@ -1,4 +1,6 @@
 import mill._, scalalib._, scalanativelib._, publish._
+import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.1.4`
+import de.tobiasroeser.mill.vcs.version.VcsVersion
 
 trait Publish extends PublishModule {
   def pomSettings = PomSettings(
@@ -11,7 +13,7 @@ trait Publish extends PublishModule {
         Developer("lolgab", "Lorenzo Gabriele", "https://github.com/lolgab")
       )
   )
-  def publishVersion = "0.0.1-SNAPSHOT"
+  def publishVersion = VcsVersion.vcsState().format()
 }
 
 object httpclient extends Cross[HttpClientModule]("2.13.8", "3.1.2")
