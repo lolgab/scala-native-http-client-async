@@ -24,9 +24,10 @@ class Request private (handle: Ptr[Byte]) {
   import CurlImpl._
   import CApi._
   import CApiOps._
-  private [httpclient] var callback: Response => Unit = null
-  private [httpclient] val memory: Ptr[Memory] = malloc(sizeof[Memory]).asInstanceOf[Ptr[Memory]]
-  private [httpclient] var headersList: Ptr[CurlSList] = null
+  private[httpclient] var callback: Response => Unit = null
+  private[httpclient] val memory: Ptr[Memory] =
+    malloc(sizeof[Memory]).asInstanceOf[Ptr[Memory]]
+  private[httpclient] var headersList: Ptr[CurlSList] = null
   memory._1 = malloc(0.toULong)
   memory._2 = 0.toULong
   curl_easy_setopt(
@@ -49,7 +50,9 @@ class Request private (handle: Ptr[Byte]) {
     this
   }
   def url(value: String): Request = {
-    Zone { implicit z => curl_easy_setopt(handle, CURLOPT_URL, toCString(value)) }
+    Zone { implicit z =>
+      curl_easy_setopt(handle, CURLOPT_URL, toCString(value))
+    }
     this
   }
   def body(value: String): Request = Zone { implicit z =>

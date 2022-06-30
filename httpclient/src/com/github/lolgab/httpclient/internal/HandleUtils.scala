@@ -11,7 +11,11 @@ private[httpclient] object HandleUtils {
 
   @inline def getData[T <: Object](handle: Ptr[Byte]): T = {
     val ptrOfPtr = stackalloc[Ptr[Byte]]()
-    curl_easy_getinfo(handle, CURLINFO_PRIVATE, ptrOfPtr.asInstanceOf[Ptr[Byte]])
+    curl_easy_getinfo(
+      handle,
+      CURLINFO_PRIVATE,
+      ptrOfPtr.asInstanceOf[Ptr[Byte]]
+    )
     val dataPtr = !ptrOfPtr
     if (dataPtr == null) null.asInstanceOf[T]
     else {

@@ -3,13 +3,14 @@ package com.github.lolgab.httpclient.internal
 import scala.scalanative.unsafe._
 
 @link("curl")
-@extern private [httpclient] object CApi {
+@extern private[httpclient] object CApi {
   type CurlBuffer = CStruct2[CString, CSize]
   type CurlOption = Int
   type CurlRequest = CStruct4[Ptr[Byte], Long, Long, Int]
   type CurlMessage = CStruct3[Int, Ptr[Byte], Ptr[Byte]]
 
-  type CurlDataCallback = CFuncPtr4[Ptr[Byte], CSize, CSize, Ptr[CurlBuffer], CSize]
+  type CurlDataCallback =
+    CFuncPtr4[Ptr[Byte], CSize, CSize, Ptr[CurlBuffer], CSize]
   type CurlSocketCallback =
     CFuncPtr5[Ptr[Byte], CInt, CInt, Ptr[Byte], Ptr[Byte], CInt]
   type CurlTimerCallback = CFuncPtr3[Ptr[Byte], Long, Ptr[Byte], CInt]

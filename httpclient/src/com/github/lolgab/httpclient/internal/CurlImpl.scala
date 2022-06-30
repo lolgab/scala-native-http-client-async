@@ -20,7 +20,7 @@ import scala.scalanative.loop.LibUVConstants._
 import com.github.lolgab.httpclient._
 import scala.annotation.tailrec
 
-private [httpclient] object CurlImpl {
+private[httpclient] object CurlImpl {
   import CApi._
   import CApiOps._
 
@@ -118,16 +118,21 @@ private [httpclient] object CurlImpl {
       if (timeout_ms < 0) uv_timer_stop(timerHandle)
       else {
         val newTimeout = if (timeout_ms == 0) 1 else timeout_ms.toLong
-        uv_timer_start(timerHandle, (_: Ptr[Byte]) => {
-          val running_handles = stackalloc[CInt]()
+        uv_timer_start(
+          timerHandle,
+          (_: Ptr[Byte]) => {
+            val running_handles = stackalloc[CInt]()
             curl_multi_socket_action(
               curlHandle,
               CURL_SOCKET_TIMEOUT,
               0,
               running_handles
             )
-          checkMultiInfo()
-        }, newTimeout, 0)
+            checkMultiInfo()
+          },
+          newTimeout,
+          0
+        )
       }
       0
     }
